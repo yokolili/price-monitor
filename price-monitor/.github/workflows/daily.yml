@@ -9,20 +9,11 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: false
+  contents: write
 
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
@@ -41,11 +32,9 @@ jobs:
       - name: 生成静态站点
         run: cd scripts && python3 build.py
 
-      - name: 上传 Pages 产物
-        uses: actions/upload-pages-artifact@v3
+      - name: 部署到 gh-pages 分支
+        uses: peaceiris/actions-gh-pages@v3
         with:
-          path: ./public
-
-      - name: 部署到 GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          publish_branch: gh-pages
