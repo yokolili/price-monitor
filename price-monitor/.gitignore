@@ -4,3 +4,6 @@ __pycache__/
 .env
 *.log
 data/reports/
+# 运行时生成的产物（每次构建/工作流都会重新生成，无需入库）
+data/history/
+public/
