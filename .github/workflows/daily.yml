@@ -1,1 +1,61 @@
+name: 部署价格监控网站
 
+on:
+  push:
+    branches: [main]
+  schedule:
+    # 每天 UTC 01:00 = 北京时间 09:00
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+
+# 关键：赋予 GITHUB_TOKEN 部署 Pages 的权限，
+# 工作流运行时会自动开启 Pages（无需手动在 Settings 里配置 Source）
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 避免并发部署互相覆盖
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 采集今日数据
+        run: cd price-monitor/scripts && python3 fetch.py
+
+      - name: 回填历史
+        run: cd price-monitor/scripts && python3 backfill.py 365
+
+      - name: 生成静态站点
+        run: cd price-monitor/scripts && python3 build.py
+
+      - name: 配置 GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: 上传站点产物
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./price-monitor/public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: 部署到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
