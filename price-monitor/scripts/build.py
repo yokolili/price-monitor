@@ -183,6 +183,9 @@ def main():
         latest = json.load(f)
     history = A.load_history()
 
+    # 确保输出目录存在（GitHub 全新检出时无 public/）
+    os.makedirs(PUBLIC, exist_ok=True)
+
     # 首页
     with open(os.path.join(PUBLIC, "index.html"), "w", encoding="utf-8") as f:
         f.write(build_index(latest, history))
