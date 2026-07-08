@@ -11,24 +11,30 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:var(--mono);line-height:1.6;
   padding:24px 16px 60px;font-size:14px}
-.wrap{max-width:920px;margin:0 auto}
-h1{font-size:22px;color:var(--gold);border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:6px}
+.wrap{max-width:960px;margin:0 auto}
+h1{font-size:22px;color:var(--gold);border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:6px;
+  animation:fadeIn .6s ease both}
 h2{font-size:18px;color:var(--accent);margin:24px 0 10px}
 h3{font-size:15px;color:var(--text);margin:14px 0 6px}
 .sub{color:var(--muted);font-size:12px;margin-bottom:18px}
 nav{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
 nav a{color:var(--accent);text-decoration:none;border:1px solid var(--border);
-  padding:6px 12px;border-radius:6px;font-size:13px}
-nav a:hover{background:var(--panel)}
+  padding:6px 12px;border-radius:6px;font-size:13px;transition:.2s}
+nav a:hover{background:var(--panel);transform:translateY(-1px)}
 .card{background:var(--panel);border:1px solid var(--border);border-radius:8px;
-  padding:14px 16px;margin-bottom:12px}
+  padding:14px 16px;margin-bottom:12px;animation:fadeIn .5s ease both}
+.src{color:var(--muted);font-size:11px;margin-top:4px}
+.src a{color:var(--accent);text-decoration:none}
 table{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px}
 th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--border)}
 th{color:var(--muted);font-weight:600}
 .up{color:var(--up)} .down{color:var(--down)} .flat{color:var(--muted)}
+.up{animation:pulseUp 2.4s ease-in-out infinite}
 .disc{color:var(--down);font-size:11px;border:1px solid var(--down);
   border-radius:4px;padding:1px 5px;margin-left:6px}
-.spark{color:var(--accent);letter-spacing:1px;font-size:13px;white-space:nowrap;overflow:hidden}
+.spark{color:var(--accent);letter-spacing:1px;font-size:13px;white-space:nowrap;overflow:hidden;
+  background:linear-gradient(90deg,var(--accent),#79c0ff,var(--accent));background-size:40px 100%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;animation:slideSpark 3s linear infinite}
 .tag{display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;
   background:#21262d;color:var(--muted);margin-left:6px}
 .note{color:var(--muted);font-size:11px;margin-top:4px}
@@ -37,13 +43,20 @@ ul{list-style:none;padding-left:0}
 li{padding:4px 0;border-bottom:1px solid var(--border)}
 .pred{color:var(--gold)}
 footer{color:var(--muted);font-size:11px;text-align:center;margin-top:30px}
+.heat td,.heat th{padding:6px 4px;font-size:12px}
+.corrpt{border-left:3px solid var(--accent);padding:6px 10px;margin:8px 0;background:var(--panel);border-radius:4px}
+.impact{font-size:12px;padding:3px 0}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes pulseUp{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes slideSpark{from{background-position:0 0}to{background-position:40px 0}}
 </style></head>
 <body><div class="wrap">
 <h1>价格观察站</h1>
-<div class="sub">黄金 · 石油 · 内存 · 硬盘 · CPU 每日价格跟踪与周期分析</div>
+<div class="sub">黄金 · 石油 · 内存 · 硬盘 · 主板 · CPU 每日价格跟踪与周期分析</div>
 
     <nav>
       <a href="../index.html">首页</a>
+      <a href="../correlation/index.html">关联分析</a>
       <a href="../weekly/index.html">周报</a>
       <a href="../monthly/index.html">月报</a>
       <a href="../yearly/index.html">年报</a>
@@ -51,24 +64,34 @@ footer{color:var(--muted);font-size:11px;text-align:center;margin-top:30px}
     </nav>
 <div class='sub'>2026-01-01 (历史回溯/模拟)</div><div class="card">
 <h3>黄金</h3>
+<div class="src">数据来源：太平洋电脑网(参考行情) · <a href="https://www.pconline.com.cn/" target="_blank" rel="noopener">太平洋电脑网</a></div>
 <table><thead><tr><th>型号</th><th>类别</th><th>今日价格</th></tr></thead>
-<tbody><tr><td>国际金价 XAU/USD<span class="tag">参考</span></td><td>伦敦金</td><td class='flat'>2,383.04 美元/盎司 </td></tr><tr><td>国内Au99.99<span class="tag">参考</span></td><td>上海金交所</td><td class='flat'>547.81 元/克 </td></tr><tr><td>品牌金饰(周大福)<span class="tag">参考</span></td><td>金饰</td><td class='flat'>547.81 元/克 </td></tr><tr><td>投资金条(银行)<span class="tag">参考</span></td><td>金条</td><td class='flat'>547.81 元/克 </td></tr></tbody></table>
+<tbody><tr><td>国际金价 XAU/USD<span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>伦敦金</td><td class='flat'>2,374.75 美元/盎司 </td></tr><tr><td>国内Au99.99<span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>上海金交所</td><td class='flat'>557.97 元/克 </td></tr><tr><td>品牌金饰(周大福)<span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>金饰</td><td class='flat'>690.63 元/克 </td></tr><tr><td>投资金条(银行)<span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>金条</td><td class='flat'>569.97 元/克 </td></tr></tbody></table>
 </div><div class="card">
 <h3>石油</h3>
+<div class="src">数据来源：太平洋电脑网(参考行情) · <a href="https://www.pconline.com.cn/" target="_blank" rel="noopener">太平洋电脑网</a></div>
 <table><thead><tr><th>型号</th><th>类别</th><th>今日价格</th></tr></thead>
-<tbody><tr><td>WTI 原油<span class="tag">参考</span></td><td>轻质原油</td><td class='flat'>78.68 美元/桶 </td></tr><tr><td>Brent 原油<span class="tag">参考</span></td><td>布伦特</td><td class='flat'>80.83 美元/桶 </td></tr><tr><td>国内成品油 92#<span class="tag">参考</span></td><td>汽油</td><td class='flat'>7.79 元/升 </td></tr><tr><td>国内成品油 0#柴油<span class="tag">参考</span></td><td>柴油</td><td class='flat'>7.78 元/升 </td></tr></tbody></table>
+<tbody><tr><td>WTI 原油<span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>轻质原油</td><td class='flat'>78.73 美元/桶 </td></tr><tr><td>Brent 原油<span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>布伦特</td><td class='flat'>82.82 美元/桶 </td></tr><tr><td>国内成品油 92#<span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>汽油</td><td class='flat'>8.02 元/升 </td></tr><tr><td>国内成品油 0#柴油<span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>柴油</td><td class='flat'>7.64 元/升 </td></tr></tbody></table>
 </div><div class="card">
 <h3>内存</h3>
+<div class="src">数据来源：太平洋电脑网(参考行情) · <a href="https://product.pconline.com.cn/memory/" target="_blank" rel="noopener">太平洋电脑网</a></div>
 <table><thead><tr><th>型号</th><th>类别</th><th>今日价格</th></tr></thead>
-<tbody><tr><td>DDR4 8GB 3200<span class="tag">参考</span></td><td>DDR4</td><td class='flat'>116.01 元 </td></tr><tr><td>DDR4 16GB 3200<span class="tag">参考</span></td><td>DDR4</td><td class='flat'>211.94 元 </td></tr><tr><td>DDR5 16GB 6000<span class="tag">参考</span></td><td>DDR5</td><td class='flat'>340.03 元 </td></tr><tr><td>DDR5 32GB 6000<span class="tag">参考</span></td><td>DDR5</td><td class='flat'>675.74 元 </td></tr><tr><td>DDR3 8GB 1600<span class="disc">停产 2022-01</span><span class="tag">参考</span></td><td>DDR3</td><td class='flat'>94.12 元 </td></tr><tr><td>DDR2 2GB 800<span class="disc">停产 2015-06</span><span class="tag">参考</span></td><td>DDR2</td><td class='flat'>60.83 元 </td></tr></tbody></table>
+<tbody><tr><td>DDR4 8GB 3200<span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>DDR4</td><td class='flat'>116.59 元 </td></tr><tr><td>DDR4 16GB 3200<span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>DDR4</td><td class='flat'>217.15 元 </td></tr><tr><td>DDR5 16GB 6000<span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>DDR5</td><td class='flat'>350.93 元 </td></tr><tr><td>DDR5 32GB 6000<span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>DDR5</td><td class='flat'>666.72 元 </td></tr><tr><td>DDR3 8GB 1600<span class="disc">停产 2022-01</span><span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>DDR3</td><td class='flat'>95.74 元 </td></tr><tr><td>DDR2 2GB 800<span class="disc">停产 2015-06</span><span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>DDR2</td><td class='flat'>60.42 元 </td></tr></tbody></table>
 </div><div class="card">
 <h3>硬盘(SSD)</h3>
+<div class="src">数据来源：太平洋电脑网(参考行情) · <a href="https://product.pconline.com.cn/ssd/" target="_blank" rel="noopener">太平洋电脑网</a></div>
 <table><thead><tr><th>型号</th><th>类别</th><th>今日价格</th></tr></thead>
-<tbody><tr><td>SATA SSD 1TB<span class="tag">参考</span></td><td>SATA</td><td class='flat'>383.33 元 </td></tr><tr><td>NVMe PCIe4 1TB<span class="tag">参考</span></td><td>NVMe Gen4</td><td class='flat'>473.17 元 </td></tr><tr><td>NVMe PCIe4 2TB<span class="tag">参考</span></td><td>NVMe Gen4</td><td class='flat'>886.05 元 </td></tr><tr><td>NVMe PCIe5 2TB<span class="tag">参考</span></td><td>NVMe Gen5</td><td class='flat'>1,534.76 元 </td></tr><tr><td>SATA SSD 120GB<span class="disc">停产 2023-03</span><span class="tag">参考</span></td><td>SATA</td><td class='flat'>98.09 元 </td></tr><tr><td>机械硬盘 3.5 1TB<span class="tag">参考</span></td><td>HDD</td><td class='flat'>273.75 元 </td></tr></tbody></table>
+<tbody><tr><td>SATA SSD 1TB<span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>SATA</td><td class='flat'>375.87 元 </td></tr><tr><td>NVMe PCIe4 1TB<span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>NVMe Gen4</td><td class='flat'>483.46 元 </td></tr><tr><td>NVMe PCIe4 2TB<span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>NVMe Gen4</td><td class='flat'>913.53 元 </td></tr><tr><td>NVMe PCIe5 2TB<span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>NVMe Gen5</td><td class='flat'>1,519.24 元 </td></tr><tr><td>SATA SSD 120GB<span class="disc">停产 2023-03</span><span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>SATA</td><td class='flat'>98.14 元 </td></tr><tr><td>机械硬盘 3.5 1TB<span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>HDD</td><td class='flat'>271.47 元 </td></tr></tbody></table>
+</div><div class="card">
+<h3>主板</h3>
+<div class="src">数据来源：太平洋电脑网(参考行情) · <a href="https://product.pconline.com.cn/motherboard/" target="_blank" rel="noopener">太平洋电脑网</a></div>
+<table><thead><tr><th>型号</th><th>类别</th><th>今日价格</th></tr></thead>
+<tbody><tr><td>B650 (AMD 主流)<span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>AMD B650</td><td class='flat'>1,056.60 元 </td></tr><tr><td>B760 (Intel 主流)<span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>Intel B760</td><td class='flat'>1,010.20 元 </td></tr><tr><td>X670E (AMD 高端)<span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>AMD X670E</td><td class='flat'>2,738.39 元 </td></tr><tr><td>Z790 (Intel 高端)<span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>Intel Z790</td><td class='flat'>2,310.56 元 </td></tr><tr><td>A520 (入门)<span class="disc">停产 2024-06</span><span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>AMD A520</td><td class='flat'>451.81 元 </td></tr><tr><td>H610 (入门)<span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>Intel H610</td><td class='flat'>496.09 元 </td></tr><tr><td>B550 (上代)<span class="disc">停产 2025-01</span><span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>AMD B550</td><td class='flat'>696.20 元 </td></tr></tbody></table>
 </div><div class="card">
 <h3>CPU</h3>
+<div class="src">数据来源：太平洋电脑网(参考行情) · <a href="https://product.pconline.com.cn/cpu/" target="_blank" rel="noopener">太平洋电脑网</a></div>
 <table><thead><tr><th>型号</th><th>类别</th><th>今日价格</th></tr></thead>
-<tbody><tr><td>Intel i5-14600K<span class="tag">参考</span></td><td>桌面</td><td class='flat'>1,915.64 元 </td></tr><tr><td>Intel i9-14900K<span class="tag">参考</span></td><td>桌面</td><td class='flat'>4,237.83 元 </td></tr><tr><td>AMD R7 7800X3D<span class="tag">参考</span></td><td>桌面</td><td class='flat'>2,561.57 元 </td></tr><tr><td>AMD R9 9950X<span class="tag">参考</span></td><td>桌面</td><td class='flat'>5,118.24 元 </td></tr><tr><td>Intel i5-12400F<span class="disc">停产 2024-12</span><span class="tag">参考</span></td><td>桌面</td><td class='flat'>890.70 元 </td></tr><tr><td>AMD R5 5600X<span class="disc">停产 2024-06</span><span class="tag">参考</span></td><td>桌面</td><td class='flat'>760.40 元 </td></tr><tr><td>Intel i7-9700K<span class="disc">停产 2022-03</span><span class="tag">参考</span></td><td>桌面</td><td class='flat'>1,465.65 元 </td></tr></tbody></table>
+<tbody><tr><td>Intel i5-14600K<span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>桌面</td><td class='flat'>1,893.49 元 </td></tr><tr><td>Intel i9-14900K<span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>桌面</td><td class='flat'>4,292.83 元 </td></tr><tr><td>AMD R7 7800X3D<span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>桌面</td><td class='flat'>2,646.23 元 </td></tr><tr><td>AMD R9 9950X<span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>桌面</td><td class='flat'>4,984.34 元 </td></tr><tr><td>Intel i5-12400F<span class="disc">停产 2024-12</span><span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>桌面</td><td class='flat'>908.72 元 </td></tr><tr><td>AMD R5 5600X<span class="disc">停产 2024-06</span><span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>桌面</td><td class='flat'>753.26 元 </td></tr><tr><td>Intel i7-9700K<span class="disc">停产 2022-03</span><span class="tag">参考</span><span class="tag">来源:太平洋参考行情</span></td><td>桌面</td><td class='flat'>1,519.01 元 </td></tr></tbody></table>
 </div>
-<footer>纯文字静态站点 · 无图片 · 数据每日自动更新 · 生成于 2026-07-08T04:32:09</footer>
+<footer>纯文字静态站点 · 无图片 · 数据每日自动更新 · 生成于 2026-07-08T06:17:33</footer>
 </div></body></html>

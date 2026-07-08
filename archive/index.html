@@ -11,24 +11,30 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);color:var(--text);font-family:var(--mono);line-height:1.6;
   padding:24px 16px 60px;font-size:14px}
-.wrap{max-width:920px;margin:0 auto}
-h1{font-size:22px;color:var(--gold);border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:6px}
+.wrap{max-width:960px;margin:0 auto}
+h1{font-size:22px;color:var(--gold);border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:6px;
+  animation:fadeIn .6s ease both}
 h2{font-size:18px;color:var(--accent);margin:24px 0 10px}
 h3{font-size:15px;color:var(--text);margin:14px 0 6px}
 .sub{color:var(--muted);font-size:12px;margin-bottom:18px}
 nav{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}
 nav a{color:var(--accent);text-decoration:none;border:1px solid var(--border);
-  padding:6px 12px;border-radius:6px;font-size:13px}
-nav a:hover{background:var(--panel)}
+  padding:6px 12px;border-radius:6px;font-size:13px;transition:.2s}
+nav a:hover{background:var(--panel);transform:translateY(-1px)}
 .card{background:var(--panel);border:1px solid var(--border);border-radius:8px;
-  padding:14px 16px;margin-bottom:12px}
+  padding:14px 16px;margin-bottom:12px;animation:fadeIn .5s ease both}
+.src{color:var(--muted);font-size:11px;margin-top:4px}
+.src a{color:var(--accent);text-decoration:none}
 table{width:100%;border-collapse:collapse;margin-top:8px;font-size:13px}
 th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--border)}
 th{color:var(--muted);font-weight:600}
 .up{color:var(--up)} .down{color:var(--down)} .flat{color:var(--muted)}
+.up{animation:pulseUp 2.4s ease-in-out infinite}
 .disc{color:var(--down);font-size:11px;border:1px solid var(--down);
   border-radius:4px;padding:1px 5px;margin-left:6px}
-.spark{color:var(--accent);letter-spacing:1px;font-size:13px;white-space:nowrap;overflow:hidden}
+.spark{color:var(--accent);letter-spacing:1px;font-size:13px;white-space:nowrap;overflow:hidden;
+  background:linear-gradient(90deg,var(--accent),#79c0ff,var(--accent));background-size:40px 100%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;animation:slideSpark 3s linear infinite}
 .tag{display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;
   background:#21262d;color:var(--muted);margin-left:6px}
 .note{color:var(--muted);font-size:11px;margin-top:4px}
@@ -37,18 +43,25 @@ ul{list-style:none;padding-left:0}
 li{padding:4px 0;border-bottom:1px solid var(--border)}
 .pred{color:var(--gold)}
 footer{color:var(--muted);font-size:11px;text-align:center;margin-top:30px}
+.heat td,.heat th{padding:6px 4px;font-size:12px}
+.corrpt{border-left:3px solid var(--accent);padding:6px 10px;margin:8px 0;background:var(--panel);border-radius:4px}
+.impact{font-size:12px;padding:3px 0}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes pulseUp{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes slideSpark{from{background-position:0 0}to{background-position:40px 0}}
 </style></head>
 <body><div class="wrap">
 <h1>价格观察站</h1>
-<div class="sub">黄金 · 石油 · 内存 · 硬盘 · CPU 每日价格跟踪与周期分析</div>
+<div class="sub">黄金 · 石油 · 内存 · 硬盘 · 主板 · CPU 每日价格跟踪与周期分析</div>
 
     <nav>
       <a href="../index.html">首页</a>
+      <a href="../correlation/index.html">关联分析</a>
       <a href="../weekly/index.html">周报</a>
       <a href="../monthly/index.html">月报</a>
       <a href="../yearly/index.html">年报</a>
       <a href="../archive/index.html">每日归档</a>
     </nav>
 <h2>每日价格归档</h2><ul><li><a href='2026-07-08.html'>2026-07-08</a> · 更新 2026-07-08</li><li><a href='2026-07-07.html'>2026-07-07</a> · 更新 2026-07-07 · 回填</li><li><a href='2026-07-06.html'>2026-07-06</a> · 更新 2026-07-06 · 回填</li><li><a href='2026-07-05.html'>2026-07-05</a> · 更新 2026-07-05 · 回填</li><li><a href='2026-07-04.html'>2026-07-04</a> · 更新 2026-07-04 · 回填</li><li><a href='2026-07-03.html'>2026-07-03</a> · 更新 2026-07-03 · 回填</li><li><a href='2026-07-02.html'>2026-07-02</a> · 更新 2026-07-02 · 回填</li><li><a href='2026-07-01.html'>2026-07-01</a> · 更新 2026-07-01 · 回填</li><li><a href='2026-06-30.html'>2026-06-30</a> · 更新 2026-06-30 · 回填</li><li><a href='2026-06-29.html'>2026-06-29</a> · 更新 2026-06-29 · 回填</li><li><a href='2026-06-28.html'>2026-06-28</a> · 更新 2026-06-28 · 回填</li><li><a href='2026-06-27.html'>2026-06-27</a> · 更新 2026-06-27 · 回填</li><li><a href='2026-06-26.html'>2026-06-26</a> · 更新 2026-06-26 · 回填</li><li><a href='2026-06-25.html'>2026-06-25</a> · 更新 2026-06-25 · 回填</li><li><a href='2026-06-24.html'>2026-06-24</a> · 更新 2026-06-24 · 回填</li><li><a href='2026-06-23.html'>2026-06-23</a> · 更新 2026-06-23 · 回填</li><li><a href='2026-06-22.html'>2026-06-22</a> · 更新 2026-06-22 · 回填</li><li><a href='2026-06-21.html'>2026-06-21</a> · 更新 2026-06-21 · 回填</li><li><a href='2026-06-20.html'>2026-06-20</a> · 更新 2026-06-20 · 回填</li><li><a href='2026-06-19.html'>2026-06-19</a> · 更新 2026-06-19 · 回填</li><li><a href='2026-06-18.html'>2026-06-18</a> · 更新 2026-06-18 · 回填</li><li><a href='2026-06-17.html'>2026-06-17</a> · 更新 2026-06-17 · 回填</li><li><a href='2026-06-16.html'>2026-06-16</a> · 更新 2026-06-16 · 回填</li><li><a href='2026-06-15.html'>2026-06-15</a> · 更新 2026-06-15 · 回填</li><li><a href='2026-06-14.html'>2026-06-14</a> · 更新 2026-06-14 · 回填</li><li><a href='2026-06-13.html'>2026-06-13</a> · 更新 2026-06-13 · 回填</li><li><a href='2026-06-12.html'>2026-06-12</a> · 更新 2026-06-12 · 回填</li><li><a href='2026-06-11.html'>2026-06-11</a> · 更新 2026-06-11 · 回填</li><li><a href='2026-06-10.html'>2026-06-10</a> · 更新 2026-06-10 · 回填</li><li><a href='2026-06-09.html'>2026-06-09</a> · 更新 2026-06-09 · 回填</li><li><a href='2026-06-08.html'>2026-06-08</a> · 更新 2026-06-08 · 回填</li><li><a href='2026-06-07.html'>2026-06-07</a> · 更新 2026-06-07 · 回填</li><li><a href='2026-06-06.html'>2026-06-06</a> · 更新 2026-06-06 · 回填</li><li><a href='2026-06-05.html'>2026-06-05</a> · 更新 2026-06-05 · 回填</li><li><a href='2026-06-04.html'>2026-06-04</a> · 更新 2026-06-04 · 回填</li><li><a href='2026-06-03.html'>2026-06-03</a> · 更新 2026-06-03 · 回填</li><li><a href='2026-06-02.html'>2026-06-02</a> · 更新 2026-06-02 · 回填</li><li><a href='2026-06-01.html'>2026-06-01</a> · 更新 2026-06-01 · 回填</li><li><a href='2026-05-31.html'>2026-05-31</a> · 更新 2026-05-31 · 回填</li><li><a href='2026-05-30.html'>2026-05-30</a> · 更新 2026-05-30 · 回填</li><li><a href='2026-05-29.html'>2026-05-29</a> · 更新 2026-05-29 · 回填</li><li><a href='2026-05-28.html'>2026-05-28</a> · 更新 2026-05-28 · 回填</li><li><a href='2026-05-27.html'>2026-05-27</a> · 更新 2026-05-27 · 回填</li><li><a href='2026-05-26.html'>2026-05-26</a> · 更新 2026-05-26 · 回填</li><li><a href='2026-05-25.html'>2026-05-25</a> · 更新 2026-05-25 · 回填</li><li><a href='2026-05-24.html'>2026-05-24</a> · 更新 2026-05-24 · 回填</li><li><a href='2026-05-23.html'>2026-05-23</a> · 更新 2026-05-23 · 回填</li><li><a href='2026-05-22.html'>2026-05-22</a> · 更新 2026-05-22 · 回填</li><li><a href='2026-05-21.html'>2026-05-21</a> · 更新 2026-05-21 · 回填</li><li><a href='2026-05-20.html'>2026-05-20</a> · 更新 2026-05-20 · 回填</li><li><a href='2026-05-19.html'>2026-05-19</a> · 更新 2026-05-19 · 回填</li><li><a href='2026-05-18.html'>2026-05-18</a> · 更新 2026-05-18 · 回填</li><li><a href='2026-05-17.html'>2026-05-17</a> · 更新 2026-05-17 · 回填</li><li><a href='2026-05-16.html'>2026-05-16</a> · 更新 2026-05-16 · 回填</li><li><a href='2026-05-15.html'>2026-05-15</a> · 更新 2026-05-15 · 回填</li><li><a href='2026-05-14.html'>2026-05-14</a> · 更新 2026-05-14 · 回填</li><li><a href='2026-05-13.html'>2026-05-13</a> · 更新 2026-05-13 · 回填</li><li><a href='2026-05-12.html'>2026-05-12</a> · 更新 2026-05-12 · 回填</li><li><a href='2026-05-11.html'>2026-05-11</a> · 更新 2026-05-11 · 回填</li><li><a href='2026-05-10.html'>2026-05-10</a> · 更新 2026-05-10 · 回填</li></ul>
-<footer>纯文字静态站点 · 无图片 · 数据每日自动更新 · 生成于 2026-07-08T04:32:09</footer>
+<footer>纯文字静态站点 · 无图片 · 数据每日自动更新 · 生成于 2026-07-08T06:17:33</footer>
 </div></body></html>
