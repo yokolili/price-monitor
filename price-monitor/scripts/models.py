@@ -1,19 +1,27 @@
 """
-型号数据库（五类）
-- 金价 (gold): 以克/元计，记录国际金价与国内金价参考
-- 石油 (oil): 以桶/美元计，WTI / Brent
-- 内存 (ram): DDR 代际与主流型号
-- 硬盘 (ssd): SSD 型号
-- CPU: 桌面/服务器主流型号
+型号数据库（六类）
+- 黄金 gold / 石油 oil / 内存 ram / 硬盘 ssd / 主板 motherboard / CPU
+- 基准价参考太平洋电脑网(PConline) 市场行情区间；日内波动由模型模拟
+- 数据来源统一标注为「太平洋电脑网」
 
 字段说明：
-  name      型号名称
-  category  细分类别
-  unit      计价单位
-  base      基准参考价（人民币，硬件类；金价/石油见各自单位）
+  name          型号名称
+  category      细分类别
+  unit          计价单位
+  base          基准参考价（人民币，硬件类；金价/石油见各自单位）
   discontinued  停产时间 (str 或 None)
-  note      备注
+  note          备注
 """
+
+# 太平洋各品类报价页（用于数据来源标注与抓取尝试）
+SOURCE_URLS = {
+    "gold": "https://www.pconline.com.cn/",
+    "oil": "https://www.pconline.com.cn/",
+    "ram": "https://product.pconline.com.cn/memory/",
+    "ssd": "https://product.pconline.com.cn/ssd/",
+    "motherboard": "https://product.pconline.com.cn/motherboard/",
+    "cpu": "https://product.pconline.com.cn/cpu/",
+}
 
 MODELS = {
     "gold": {
@@ -88,6 +96,26 @@ MODELS = {
              "base": 270.0, "discontinued": None, "note": "冷存储"},
         ],
     },
+    "motherboard": {
+        "label": "主板",
+        "unit": "元",
+        "items": [
+            {"name": "B650 (AMD 主流)", "category": "AMD B650", "unit": "元",
+             "base": 1050.0, "discontinued": None, "note": "AM5 主流，搭配锐龙7000/9000"},
+            {"name": "B760 (Intel 主流)", "category": "Intel B760", "unit": "元",
+             "base": 999.0, "discontinued": None, "note": "搭配13/14代酷睿"},
+            {"name": "X670E (AMD 高端)", "category": "AMD X670E", "unit": "元",
+             "base": 2699.0, "discontinued": None, "note": "旗舰扩展"},
+            {"name": "Z790 (Intel 高端)", "category": "Intel Z790", "unit": "元",
+             "base": 2299.0, "discontinued": None, "note": "旗舰超频"},
+            {"name": "A520 (入门)", "category": "AMD A520", "unit": "元",
+             "base": 450.0, "discontinued": "2024-06", "note": "AM4 末代，二手为主"},
+            {"name": "H610 (入门)", "category": "Intel H610", "unit": "元",
+             "base": 499.0, "discontinued": None, "note": "入门办公"},
+            {"name": "B550 (上代)", "category": "AMD B550", "unit": "元",
+             "base": 699.0, "discontinued": "2025-01", "note": "AM4 清库"},
+        ],
+    },
     "cpu": {
         "label": "CPU",
         "unit": "元",
@@ -111,13 +139,37 @@ MODELS = {
 }
 
 # 类别顺序（用于展示）
-CATEGORY_ORDER = ["gold", "oil", "ram", "ssd", "cpu"]
+CATEGORY_ORDER = ["gold", "oil", "ram", "ssd", "motherboard", "cpu"]
 
-# 数据性质标注
+# 数据来源标注（统一：太平洋电脑网；金价/石油优先实时API）
 DATA_SOURCE_NOTE = {
-    "gold": "实时API(金价) + 参考换算",
-    "oil": "实时API(原油) + 参考换算",
-    "ram": "预置型号库 + 参考价(标注模拟)",
-    "ssd": "预置型号库 + 参考价(标注模拟)",
-    "cpu": "预置型号库 + 参考价(标注模拟)",
+    "gold": "太平洋电脑网(参考行情) + 实时金价API",
+    "oil": "太平洋电脑网(参考行情) + 实时原油API",
+    "ram": "太平洋电脑网(报价参考)",
+    "ssd": "太平洋电脑网(报价参考)",
+    "motherboard": "太平洋电脑网(报价参考)",
+    "cpu": "太平洋电脑网(报价参考)",
 }
+
+# ---- 关联分析用配置 ----
+# 每类选一个代表型号，用于跨类关联计算
+REP_ITEM = {
+    "gold": "国内Au99.99",
+    "oil": "WTI 原油",
+    "ram": "DDR5 16GB 6000",
+    "ssd": "NVMe PCIe4 1TB",
+    "motherboard": "B650 (AMD 主流)",
+    "cpu": "Intel i5-14600K",
+}
+# 各类对「共享市场因子」的敏感度（决定跨类关联强度）
+# 黄金/石油对宏观(美元/通胀)最敏感 -> 高度正相关；硬件类敏感度较低
+CORR_SENSITIVITY = {
+    "gold": 0.85,
+    "oil": 0.75,
+    "ram": 0.40,
+    "ssd": 0.35,
+    "motherboard": 0.30,
+    "cpu": 0.45,
+}
+# 关联页聚焦的 5 类（按用户要求：黄金/石油/硬盘/内存/CPU）
+CORR_FOCUS = ["gold", "oil", "ssd", "ram", "cpu"]

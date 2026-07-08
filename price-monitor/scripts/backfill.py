@@ -1,29 +1,20 @@
 """
-回填历史数据：纯本地确定性生成（不联网，模拟历史）
-让周/月/年对比报告首次即有数据可比。
-页面会标注回填数据为"历史回溯(模拟)"。
+回填历史数据：本地确定性生成（不联网）
+- 使用「共享市场因子」模型，使跨类关联真实可比
+- 让周/月/年对比报告与关联分析页首次即有数据可比
+- 页面会标注回填数据为「历史回溯(模拟)」
 """
 import json
 import os
 import sys
-import random
 from datetime import date, timedelta
 
 sys.path.insert(0, os.path.dirname(__file__))
 from models import MODELS, DATA_SOURCE_NOTE, CATEGORY_ORDER
+import market
 
 ROOT = os.path.dirname(os.path.dirname(__file__))
 HISTORY_DIR = os.path.join(ROOT, "data", "history")
-USD_CNY = 7.15
-
-
-def day_seed(d: date):
-    return d.year * 10000 + d.month * 100 + d.day
-
-
-def wobble(base, d: date, salt, pct=0.03):
-    random.seed(day_seed(d) + salt)
-    return round(base * (1 + random.uniform(-pct, pct)), 2)
 
 
 def make_record(d: date):
@@ -34,29 +25,22 @@ def make_record(d: date):
         "source_note": DATA_SOURCE_NOTE,
         "categories": {},
     }
-    # 金价（含 XAU 换算）
-    xau_base = 2350.0
-    gold_items = []
-    for idx, it in enumerate(MODELS["gold"]["items"]):
-        if "XAU" in it["name"]:
-            val = wobble(xau_base, d, 1, 0.02)
-        elif "元/克" in it["unit"]:
-            val = round(wobble(xau_base, d, 1, 0.02) / 31.1035 * USD_CNY, 2)
-        else:
-            val = wobble(it["base"], d, 2 + idx, 0.02)
-        gold_items.append({"name": it["name"], "category": it["category"],
-                            "unit": it["unit"], "price": val,
-                            "discontinued": it["discontinued"], "note": it["note"]})
-    rec["categories"]["gold"] = {"label": MODELS["gold"]["label"], "realtime": False, "items": gold_items}
-
-    for cat in ["oil", "ram", "ssd", "cpu"]:
+    for cat in CATEGORY_ORDER:
         items = []
         for idx, it in enumerate(MODELS[cat]["items"]):
-            val = wobble(it["base"], d, 100 + idx, 0.03)
-            items.append({"name": it["name"], "category": it["category"],
-                          "unit": it["unit"], "price": val,
-                          "discontinued": it["discontinued"], "note": it["note"]})
-        rec["categories"][cat] = {"label": MODELS[cat]["label"], "realtime": False, "items": items}
+            val = market.price(cat, it["base"], d, idx)
+            items.append({
+                "name": it["name"], "category": it["category"],
+                "unit": it["unit"], "price": val,
+                "discontinued": it["discontinued"], "note": it["note"],
+                "source": "太平洋参考行情",
+            })
+        rec["categories"][cat] = {
+            "label": MODELS[cat]["label"],
+            "realtime": False,
+            "source": "太平洋电脑网(参考行情)",
+            "items": items,
+        }
     return rec
 
 

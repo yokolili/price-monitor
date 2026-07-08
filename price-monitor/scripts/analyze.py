@@ -164,6 +164,105 @@ def reason_text(cat, change):
     return "近期多空因素均衡，" + templates[0]
 
 
+# ---------- 关联分析（黄金/石油/硬盘/内存/CPU）----------
+
+def _rep_prices(data, cat):
+    """返回 {date: price} 代表型号序列"""
+    from models import REP_ITEM
+    ser = series_for(data, cat, REP_ITEM[cat])
+    return dict(ser)
+
+
+def _returns_map(data, cats):
+    prices = {c: _rep_prices(data, c) for c in cats}
+    dates = sorted(set().union(*[set(p.keys()) for p in prices.values()]))
+    ret = {}
+    for c in cats:
+        r = {}
+        prev = None
+        for d in dates:
+            if d in prices[c]:
+                p = prices[c][d]
+                if prev:
+                    r[d] = (p - prev) / prev if prev else 0.0
+                prev = p
+        ret[c] = r
+    return ret, dates
+
+
+def _pearson(x, y):
+    n = len(x)
+    if n < 2:
+        return 0.0
+    mx = statistics.mean(x)
+    my = statistics.mean(y)
+    num = sum((a - mx) * (b - my) for a, b in zip(x, y))
+    dx = sum((a - mx) ** 2 for a in x) ** 0.5
+    dy = sum((b - my) ** 2 for b in y) ** 0.5
+    return num / (dx * dy) if dx and dy else 0.0
+
+
+def correlation_matrix(data, cats):
+    """返回 (matrix, common_dates)。matrix[cat][cat2] = 皮尔逊相关系数"""
+    ret, dates = _returns_map(data, cats)
+    common = sorted(set.intersection(*[set(ret[c].keys()) for c in cats]))
+    mat = {c: {c2: None for c2 in cats} for c in cats}
+    for i, a in enumerate(cats):
+        for b in cats[i:]:
+            if a == b:
+                mat[a][b] = 1.0
+            else:
+                xa = [ret[a][d] for d in common]
+                xb = [ret[b][d] for d in common]
+                v = round(_pearson(xa, xb), 3)
+                mat[a][b] = v
+                mat[b][a] = v
+    return mat, common
+
+
+def impact_nodes(data, cats, threshold=0.018):
+    """返回 [(date, cat, change)]：代表型号日涨幅超阈值的时点（影响节点）"""
+    ret, dates = _returns_map(data, cats)
+    out = []
+    for d in dates:
+        for c in cats:
+            if d in ret[c] and abs(ret[c][d]) >= threshold:
+                out.append((d, c, ret[c][d]))
+    out.sort()
+    return out
+
+
+# 真实世界关联点（因果叙述），与数值关联互为补充
+CORR_POINTS = [
+    ("黄金 ↔ 石油", "正相关", "二者同受美元指数与通胀预期驱动；避险/通胀升温时往往同向波动。"),
+    ("石油 → 硬盘/内存", "弱正相关", "油价影响石化原料(封装胶材)与制造能源成本，间接传导至 NAND/DRAM 报价。"),
+    ("内存 ↔ CPU", "正相关", "新平台(如 DDR5 配合新接口 CPU)同期发布，需求与换代节奏联动。"),
+    ("黄金 ↔ 硬盘/CPU", "弱/不相关", "黄金属避险资产，硬件属工业消费品，驱动因子不同，关联较弱。"),
+]
+
+
+def correlation_report(data):
+    """结构化关联报告，供 build 生成关联页"""
+    from models import CORR_FOCUS, CATEGORY_ORDER
+    cats = CORR_FOCUS
+    mat, common = correlation_matrix(data, cats)
+    # 配对排序
+    pairs = []
+    for i, a in enumerate(cats):
+        for b in cats[i + 1:]:
+            pairs.append((a, b, mat[a][b]))
+    pairs.sort(key=lambda x: x[2], reverse=True)
+    nodes = impact_nodes(data, cats)
+    return {
+        "cats": cats,
+        "matrix": mat,
+        "common_days": len(common),
+        "pairs": pairs,
+        "impact": nodes,
+        "points": CORR_POINTS,
+    }
+
+
 def build_period_report(period, data):
     """period: 'week'|'month'|'year'"""
     dates = list(data.keys())
