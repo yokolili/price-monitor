@@ -157,24 +157,85 @@ def build_index(latest, history):
     return page("今日价格", body, base="")
 
 
-def build_archive_page(history):
-    items = []
-    for d in sorted(history.keys(), reverse=True)[:60]:
-        rec = history[d]
-        items.append(f"<li><a href='{esc(d)}.html'>{esc(d)}</a> · 更新 {esc(rec['updated_at'][:10])}"
-                     f"{' · 回填' if rec.get('backfilled') else ''}</li>")
-    body = f"<h2>每日价格归档</h2><ul>{''.join(items)}</ul>"
-    return page("每日归档", body, base="../")
+# 归档单页：内联全部历史为紧凑 JSON，前端下拉切换渲染，避免 365 个重复文件（体积从 ~4MB 降至 ~150KB）
+ARCHIVE_JS = """
+const PAYLOAD = /*DATA*/;
+const SRC = /*SRC*/;
+const CATS = PAYLOAD.cats, M = PAYLOAD.models, DATES = PAYLOAD.dates, DAILY = PAYLOAD.daily;
+function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function fmt(p){return Number(p).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2});}
+function render(date){
+  var rec=DAILY[date]; if(!rec) return;
+  var i=DATES.indexOf(date);
+  var prev=(i>0)?DAILY[DATES[i-1]]:null;
+  var cards='';
+  for(var k=0;k<CATS.length;k++){
+    var cat=CATS[k]; var m=M[cat]; if(!m) continue;
+    var prices=rec.c[cat]; if(!prices) continue;
+    var prevPrices=prev?prev.c[cat]:null;
+    var rows='';
+    for(var j=0;j<m.items.length;j++){
+      var it=m.items[j]; var p=prices[j];
+      var cls='flat',delta='';
+      if(prevPrices&&prevPrices[j]!=null&&prevPrices[j]!==0){
+        var dd=(p-prevPrices[j])/prevPrices[j]*100;
+        delta=(dd>=0?'+':'')+dd.toFixed(2)+'%';
+        cls=dd>0.05?'up':(dd<-0.05?'down':'flat');
+      }
+      var disc=it.d?('<span class="disc">停产 '+esc(it.d)+'</span>'):'';
+      var rt=m.realtime?'<span class="tag">实时</span>':'<span class="tag">参考</span>';
+      var sr='<span class="tag">来源:'+esc(it.s)+'</span>';
+      rows+='<tr><td>'+esc(it.n)+disc+rt+sr+'</td><td>'+esc(it.c)+'</td><td class="'+cls+'">'+fmt(p)+' '+esc(it.u)+' '+delta+'</td></tr>';
+    }
+    var srv='<div class="src">数据来源：'+esc(m.source)+' · <a href="'+esc(SRC[cat]||'#')+'" target="_blank" rel="noopener">太平洋电脑网</a></div>';
+    cards+='<div class="card"><h3>'+esc(m.label)+'</h3>'+srv+'<table><thead><tr><th>型号</th><th>类别</th><th>今日价格</th></tr></thead><tbody>'+rows+'</tbody></table></div>';
+  }
+  var sub='<div class="sub">更新时间：'+esc(rec.u)+' '+(rec.b?'(历史回溯/模拟)':'')+' · 可查 '+DATES.length+' 天</div>';
+  document.getElementById('content').innerHTML=sub+cards;
+}
+function init(){
+  var sel=document.getElementById('dt');
+  for(var i=0;i<DATES.length;i++){var o=document.createElement('option');o.value=DATES[i];o.text=DATES[i];sel.appendChild(o);}
+  sel.value=DATES[DATES.length-1];
+  sel.onchange=function(){render(this.value);};
+  render(sel.value);
+}
+window.onload=init;
+"""
 
 
-def build_daily_page(d, rec):
-    blocks = []
+def build_archive_single(history):
+    dates = sorted(history.keys())
+    tmpl = history[dates[-1]]
+    models = {}
     for cat in CATEGORY_ORDER:
-        c = rec["categories"].get(cat)
-        if c:
-            blocks.append(category_block(cat, c, None))
-    body = f"<div class='sub'>{esc(d)}{' (历史回溯/模拟)' if rec.get('backfilled') else ''}</div>{''.join(blocks)}"
-    return page(f"每日价格 {d}", body, base="../")
+        c = tmpl["categories"].get(cat)
+        if not c:
+            continue
+        items = [{"n": it["name"], "c": it["category"], "u": it["unit"],
+                  "s": it.get("source", "太平洋"), "d": bool(it["discontinued"])}
+                 for it in c["items"]]
+        models[cat] = {"label": c["label"], "source": c.get("source", "太平洋电脑网"),
+                       "realtime": bool(c.get("realtime")), "items": items}
+    daily = {}
+    for d in dates:
+        rec = history[d]
+        cats = {}
+        for cat in CATEGORY_ORDER:
+            c = rec["categories"].get(cat)
+            cats[cat] = [it["price"] for it in c["items"]] if c else None
+        daily[d] = {"u": rec.get("updated_at", ""), "b": bool(rec.get("backfilled")), "c": cats}
+    payload = {"cats": CATEGORY_ORDER, "models": models, "dates": dates, "daily": daily}
+    data_json = json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
+    data_json = data_json.replace("</", "<\\/")
+    src_json = json.dumps(SOURCE_URLS, ensure_ascii=False)
+    js = ARCHIVE_JS.replace("/*DATA*/", data_json).replace("/*SRC*/", src_json)
+    head = ("<div class='sub'>选择日期查看当日全品类价格快照（全部历史已内联，离线可用）：</div>"
+            "<div style='margin:10px 0'><select id='dt' style='background:var(--panel);"
+            "color:var(--text);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:13px'>"
+            "</select></div><div id='content'></div>")
+    body = head + "<script>" + js + "</script>"
+    return page("每日价格归档", body, base="../")
 
 
 def build_report_page(period, title, base="../"):
@@ -310,11 +371,7 @@ def main():
 
     os.makedirs(os.path.join(PUBLIC, "archive"), exist_ok=True)
     with open(os.path.join(PUBLIC, "archive", "index.html"), "w", encoding="utf-8") as f:
-        f.write(build_archive_page(history))
-
-    for d, rec in history.items():
-        with open(os.path.join(PUBLIC, "archive", f"{d}.html"), "w", encoding="utf-8") as f:
-            f.write(build_daily_page(d, rec))
+        f.write(build_archive_single(history))
 
     for period, title, folder in [
         ("week", "近一周价格对比报告", "weekly"),
@@ -330,8 +387,7 @@ def main():
     with open(os.path.join(PUBLIC, "correlation", "index.html"), "w", encoding="utf-8") as f:
         f.write(build_correlation_page(history, base="../"))
 
-    n_archive = len(history)
-    print(f"站点生成完成：首页 + 关联分析页 + 归档{n_archive}页 + 周/月/年报告")
+    print(f"站点生成完成：首页 + 关联分析页 + 归档单页(内联{len(history)}天) + 周/月/年报告")
 
 
 if __name__ == "__main__":
